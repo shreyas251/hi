@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Military Database</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #2F3C47; /* Dark Charcoal/Blue-Grey */
+            color: #E0E6EB; /* Light grey/off-white for contrast */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .card {
+            background-color: #3A4B58; /* Slightly lighter, still dark */
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow */
+            padding: 1.5rem;
+        }
+        h1, h2 {
+            color: #F8F9FA; /* Brighter white for headings */
+        }
+        textarea {
+            font-family: monospace;
+            resize: vertical;
+            background-color: #4A5C6A; /* Darker input background */
+            color: #E0E6EB;
+            border-color: #5B6B7A; /* Muted border color */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #5B6B7A; /* Muted border color */
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: #475569; /* Slate Grey */
+            font-weight: 600;
+            color: #F8F9FA; /* White text for headers */
+        }
+        tr:nth-child(even) {
+            background-color: #3F505E; /* Slightly different row color */
+        }
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #1E40AF; /* Darker blue */
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: #1D3588;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background-color: #64748b; /* Existing secondary, still fits */
+            color: #ffffff;
+        }
+        .btn-secondary:hover {
+            background-color: #475569;
+            transform: translateY(-1px);
+        }
+        .btn-success {
+            background-color: #4CAF50; /* Military Green */
+            color: #ffffff;
+        }
+        .btn-success:hover {
+            background-color: #388E3C;
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background-color: #EF4444; /* Existing red */
+            color: #ffffff;
+        }
+        .btn-danger:hover {
+            background-color: #DC2626;
+            transform: translateY(-1px);
+        }
+        .btn-info {
+            background-color: #0EA5E9; /* Existing info blue */
+            color: #ffffff;
+        }
+        .btn-info:hover {
+            background-color: #0284C7;
+            transform: translateY(-1px);
+        }
+        .message-box {
+            background-color: #5B6B7A; /* Muted background for messages */
+            border: 1px solid #7F8C9A; /* Slightly lighter border */
+            color: #F8F9FA; /* Light text for messages */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: none; /* Hidden by default */
+        }
+        .message-box.show {
+            display: block;
+        }
+        .message-box.bg-red-100 { /* Override for error messages */
+            background-color: #EF4444;
+            border-color: #DC2626;
+            color: #ffffff;
+        }
+        .message-box.bg-green-100 { /* Override for success messages */
+            background-color: #4CAF50;
+            border-color: #388E3C;
+            color: #ffffff;
+        }
+        .message-box.bg-yellow-100 { /* Override for info messages */
+            background-color: #FCD34D;
+            border-color: #FBBF24;
+            color: #334155; /* Darker text for yellow */
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #E0E6EB; /* Light text for labels */
+        }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #5B6B7A; /* Muted border */
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #4A5C6A; /* Darker input background */
+            color: #E0E6EB;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <div class="container flex-grow">
+        <h1 class="text-4xl font-bold text-center mb-8">Military Database</h1>
+
+        <div class="card mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <button id="selectAllSoldiersBtn" class="btn btn-info">Select All Soldiers</button>
+                <button id="selectAllUnitsBtn" class="btn btn-info">Select All Units</button>
+                <button id="selectAllEquipmentBtn" class="btn btn-info">Select All Equipment</button>
+                <button id="selectAllMissionsBtn" class="btn btn-info">Select All Missions</button>
+            </div>
+            <div class="flex flex-wrap gap-3 mt-4 items-center">
+                <label for="actionDropdown" class="font-semibold mr-2">Perform Action:</label>
+                <select id="actionDropdown" class="w-full md:w-auto flex-grow p-2 border rounded-lg">
+                    <option value="">-- Select Action --</option>
+                    <option value="addSoldier">Add Soldier</option>
+                    <option value="addUnit">Add Unit</option>
+                    <option value="addEquipment">Add Equipment</option>
+                    <option value="addMission">Add Mission</option>
+                    <option value="updateSoldier">Update Soldier</option>
+                    <option value="updateUnit">Update Unit</option>
+                    <option value="updateEquipment">Update Equipment</option>
+                    <option value="updateMission">Update Mission</option>
+                </select>
+                <button id="resetDbBtn" class="btn btn-danger ml-0 md:ml-4 mt-3 md:mt-0">Reset Database</button>
+            </div>
+        </div>
+
+        <div id="formsContainer" class="card mb-6 hidden">
+            <div id="addSoldierFormContainer" class="hidden">
+                <h2 class="text-2xl font-semibold mb-4">Add New Soldier</h2>
+                <form id="addSoldierForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="addSoldierFirstName">First Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="addSoldierFirstName" class="w-full" placeholder="Soldier's First Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addSoldierLastName">Last Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="addSoldierLastName" class="w-full" placeholder="Soldier's Last Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addSoldierDateOfBirth">Date of Birth</label>
+                        <input type="date" id="addSoldierDateOfBirth" class="w-full">
+                    </div>
+                    <div class="form-group">
+                        <label for="addSoldierGender">Gender</label>
+                        <select id="addSoldierGender" class="w-full">
+                            <option value="">-- Select Gender --</option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                            <option value="O">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addSoldierRank">Rank <span class="text-red-500">*</span></label>
+                        <select id="addSoldierRank" class="w-full" required>
+                            <option value="">-- Select Rank --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addSoldierUnit">Unit</label>
+                        <select id="addSoldierUnit" class="w-full">
+                            <option value="">-- Select Unit --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addSoldierDateOfEnlistment">Date of Enlistment <span class="text-red-500">*</span></label>
+                        <input type="date" id="addSoldierDateOfEnlistment" class="w-full" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addSoldierStatus">Status</label>
+                        <select id="addSoldierStatus" class="w-full">
+                            <option value="Active">Active</option>
+                            <option value="Deployed">Deployed</option>
+                            <option value="Injured">Injured</option>
+                            <option value="Leave">Leave</option>
+                            <option value="Retired">Retired</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-success">Add Soldier</button>
+                        <button type="button" id="closeAddSoldierFormBtn" class="btn btn-secondary ml-2">Close</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="addUnitFormContainer" class="hidden">
+                <h2 class="text-2xl font-semibold mb-4">Add New Unit</h2>
+                <form id="addUnitForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="addUnitName">Unit Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="addUnitName" class="w-full" placeholder="New Unit Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addUnitLocation">Location</label>
+                        <input type="text" id="addUnitLocation" class="w-full" placeholder="Unit Location">
+                    </div>
+                    <div class="form-group">
+                        <label for="addUnitType">Unit Type</label>
+                        <input type="text" id="addUnitType" class="w-full" placeholder="e.g., Infantry, Air Force">
+                    </div>
+                    <div class="form-group">
+                        <label for="addUnitCommander">Commander</label>
+                        <select id="addUnitCommander" class="w-full">
+                            <option value="">-- Select Commander --</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-success">Add Unit</button>
+                        <button type="button" id="closeAddUnitFormBtn" class="btn btn-secondary ml-2">Close</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="addEquipmentFormContainer" class="hidden">
+                <h2 class="text-2xl font-semibold mb-4">Add New Equipment</h2>
+                <form id="addEquipmentForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="addEquipmentName">Equipment Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="addEquipmentName" class="w-full" placeholder="e.g., M4 Carbine" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addEquipmentType">Equipment Type</label>
+                        <input type="text" id="addEquipmentType" class="w-full" placeholder="e.g., Rifle, Jet">
+                    </div>
+                    <div class="form-group">
+                        <label for="addSerialNumber">Serial Number <span class="text-red-500">*</span></label>
+                        <input type="text" id="addSerialNumber" class="w-full" placeholder="Unique Serial Number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addEquipmentUnit">Current Unit</label>
+                        <select id="addEquipmentUnit" class="w-full">
+                            <option value="">-- Select Unit --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addEquipmentStatus">Status</label>
+                        <select id="addEquipmentStatus" class="w-full">
+                            <option value="Operational">Operational</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Damaged">Damaged</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-success">Add Equipment</button>
+                        <button type="button" id="closeAddEquipmentFormBtn" class="btn btn-secondary ml-2">Close</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="addMissionFormContainer" class="hidden">
+                <h2 class="text-2xl font-semibold mb-4">Add New Mission</h2>
+                <form id="addMissionForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="addMissionName">Mission Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="addMissionName" class="w-full" placeholder="e.g., Operation Desert Storm" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addMissionStartDate">Start Date <span class="text-red-500">*</span></label>
+                        <input type="date" id="addMissionStartDate" class="w-full" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addMissionEndDate">End Date</label>
+                        <input type="date" id="addMissionEndDate" class="w-full">
+                    </div>
+                    <div class="form-group md:col-span-2">
+                        <label for="addMissionObjective">Objective</label>
+                        <textarea id="addMissionObjective" class="w-full p-3 border rounded-lg focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="Brief objective of the mission"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="addMissionStatus">Status</label>
+                        <select id="addMissionStatus" class="w-full">
+                            <option value="Planned">Planned</option>
+                            <option value="Ongoing">Ongoing</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Aborted">Aborted</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-success">Add Mission</button>
+                        <button type="button" id="closeAddMissionFormBtn" class="btn btn-secondary ml-2">Close</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="updateSoldierFormContainer" class="hidden">
+                <h2 class="text-2xl font-semibold mb-4">Update Soldier Details</h2>
+                <form id="updateSoldierForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group md:col-span-2">
+                        <label for="selectSoldierToUpdate">Select Soldier to Update <span class="text-red-500">*</span></label>
+                        <select id="selectSoldierToUpdate" class="w-full">
+                            <option value="">-- Select Soldier --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateFirstName">First Name</label>
+                        <input type="text" id="updateFirstName" class="w-full" placeholder="New First Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateLastName">Last Name</label>
+                        <input type="text" id="updateLastName" class="w-full" placeholder="New Last Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateRank">Rank</label>
+                        <select id="updateRank" class="w-full">
+                            <option value="">-- Select Rank --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateUnit">Unit</label>
+                        <select id="updateUnit" class="w-full">
+                            <option value="">-- Select Unit --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateStatus">Status</label>
+                        <select id="updateStatus" class="w-full">
+                            <option value="">-- Select Status --</option>
+                            <option value="Active">Active</option>
+                            <option value="Deployed">Deployed</option>
+                            <option value="Injured">Injured</option>
+                            <option value="Leave">Leave</option>
+                            <option value="Retired">Retired</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-success">Update Soldier</button>
+                        <button type="button" id="closeUpdateSoldierFormBtn" class="btn btn-secondary ml-2">Close</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="updateUnitFormContainer" class="hidden">
+                <h2 class="text-2xl font-semibold mb-4">Update Unit Details</h2>
+                <form id="updateUnitForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group md:col-span-2">
+                        <label for="selectUnitToUpdate">Select Unit to Update <span class="text-red-500">*</span></label>
+                        <select id="selectUnitToUpdate" class="w-full">
+                            <option value="">-- Select Unit --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateUnitName">Unit Name</label>
+                        <input type="text" id="updateUnitName" class="w-full" placeholder="New Unit Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateUnitLocation">Location</label>
+                        <input type="text" id="updateUnitLocation" class="w-full" placeholder="New Location">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateUnitType">Unit Type</label>
+                        <input type="text" id="updateUnitType" class="w-full" placeholder="New Unit Type">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateUnitCommander">Commander</label>
+                        <select id="updateUnitCommander" class="w-full">
+                            <option value="">-- Select Commander --</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-success">Update Unit</button>
+                        <button type="button" id="closeUpdateUnitFormBtn" class="btn btn-secondary ml-2">Close</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="updateEquipmentFormContainer" class="hidden">
+                <h2 class="text-2xl font-semibold mb-4">Update Equipment Details</h2>
+                <form id="updateEquipmentForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group md:col-span-2">
+                        <label for="selectEquipmentToUpdate">Select Equipment to Update <span class="text-red-500">*</span></label>
+                        <select id="selectEquipmentToUpdate" class="w-full">
+                            <option value="">-- Select Equipment --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateEquipmentName">Equipment Name</label>
+                        <input type="text" id="updateEquipmentName" class="w-full" placeholder="New Equipment Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateEquipmentType">Equipment Type</label>
+                        <input type="text" id="updateEquipmentType" class="w-full" placeholder="New Equipment Type">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateSerialNumber">Serial Number</label>
+                        <input type="text" id="updateSerialNumber" class="w-full" placeholder="New Serial Number">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateEquipmentUnit">Current Unit</label>
+                        <select id="updateEquipmentUnit" class="w-full">
+                            <option value="">-- Select Unit --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateEquipmentStatus">Status</label>
+                        <select id="updateEquipmentStatus" class="w-full">
+                            <option value="">-- Select Status --</option>
+                            <option value="Operational">Operational</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Damaged">Damaged</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-success">Update Equipment</button>
+                        <button type="button" id="closeUpdateEquipmentFormBtn" class="btn btn-secondary ml-2">Close</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="updateMissionFormContainer" class="hidden">
+                <h2 class="text-2xl font-semibold mb-4">Update Mission Details</h2>
+                <form id="updateMissionForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group md:col-span-2">
+                        <label for="selectMissionToUpdate">Select Mission to Update <span class="text-red-500">*</span></label>
+                        <select id="selectMissionToUpdate" class="w-full">
+                            <option value="">-- Select Mission --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateMissionName">Mission Name</label>
+                        <input type="text" id="updateMissionName" class="w-full" placeholder="New Mission Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateMissionStartDate">Start Date</label>
+                        <input type="date" id="updateMissionStartDate" class="w-full">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateMissionEndDate">End Date</label>
+                        <input type="date" id="updateMissionEndDate" class="w-full">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateMissionObjective">Objective</label>
+                        <textarea id="updateMissionObjective" class="w-full p-3 border rounded-lg focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="New Mission Objective"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateMissionStatus">Status</label>
+                        <select id="updateMissionStatus" class="w-full">
+                            <option value="">-- Select Status --</option>
+                            <option value="Planned">Planned</option>
+                            <option value="Ongoing">Ongoing</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Aborted">Aborted</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button type="submit" class="btn btn-success">Update Mission</button>
+                        <button type="button" id="closeUpdateMissionFormBtn" class="btn btn-secondary ml-2">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="messageBox" class="message-box"></div>
+
+        <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">Query Results</h2>
+            <div id="resultsOutput" class="overflow-x-auto">
+                <p class="text-gray-500">Results will appear here...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+
+    <script>
+        let db; // Global database object
+
+        // Function to show messages in the message box
+        function showMessage(message, type = 'info') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = `message-box show ${type === 'error' ? 'bg-red-100 border-red-400 text-red-700' : type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-yellow-100 border-yellow-400 text-yellow-700'}`;
+            // Automatically hide after 5 seconds
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 5000);
+        }
+
+        // Helper function to hide all forms
+        function hideAllForms() {
+            document.getElementById('formsContainer').classList.add('hidden');
+            document.getElementById('addSoldierFormContainer').classList.add('hidden');
+            document.getElementById('addUnitFormContainer').classList.add('hidden');
+            document.getElementById('addEquipmentFormContainer').classList.add('hidden');
+            document.getElementById('addMissionFormContainer').classList.add('hidden');
+            document.getElementById('updateSoldierFormContainer').classList.add('hidden');
+            document.getElementById('updateUnitFormContainer').classList.add('hidden');
+            document.getElementById('updateEquipmentFormContainer').classList.add('hidden');
+            document.getElementById('updateMissionFormContainer').classList.add('hidden');
+        }
+
+        // Helper function to clear a form's fields
+        function clearFormFields(formId) {
+            const form = document.getElementById(formId);
+            if (form) {
+                form.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], textarea').forEach(input => input.value = '');
+                form.querySelectorAll('select').forEach(select => select.value = '');
+            }
+        }
+
+        // --- Dropdown Population Functions ---
+
+        function populateRanksDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">-- Select Rank --</option>';
+            try {
+                const ranks = db.exec("SELECT RankID, RankName FROM Ranks ORDER BY RankID;");
+                if (ranks.length > 0) {
+                    ranks[0].values.forEach(row => {
+                        const option = document.createElement('option');
+                        option.value = row[0]; // RankID
+                        option.textContent = row[1]; // RankName
+                        selectElement.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error("Error populating ranks dropdown:", err);
+            }
+        }
+
+        function populateUnitsDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">-- Select Unit --</option>';
+            try {
+                const units = db.exec("SELECT UnitID, UnitName FROM Units ORDER BY UnitName;");
+                if (units.length > 0) {
+                    units[0].values.forEach(row => {
+                        const option = document.createElement('option');
+                        option.value = row[0]; // UnitID
+                        option.textContent = row[1]; // UnitName
+                        selectElement.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error("Error populating units dropdown:", err);
+            }
+        }
+
+        function populateSoldiersForCommanderDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">-- Select Commander --</option>';
+            try {
+                const soldiers = db.exec("SELECT SoldierID, FirstName, LastName FROM Soldiers ORDER BY LastName, FirstName;");
+                if (soldiers.length > 0) {
+                    soldiers[0].values.forEach(row => {
+                        const option = document.createElement('option');
+                        option.value = row[0]; // SoldierID
+                        option.textContent = `${row[1]} ${row[2]} (ID: ${row[0]})`; // FirstName LastName (ID: ID)
+                        selectElement.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error("Error populating soldiers for commander dropdown:", err);
+            }
+        }
+
+        function populateSoldiersForUpdateDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">-- Select Soldier --</option>';
+            try {
+                const soldiers = db.exec("SELECT SoldierID, FirstName, LastName FROM Soldiers ORDER BY LastName, FirstName;");
+                if (soldiers.length > 0) {
+                    soldiers[0].values.forEach(row => {
+                        const option = document.createElement('option');
+                        option.value = row[0]; // SoldierID
+                        option.textContent = `${row[1]} ${row[2]} (ID: ${row[0]})`; // FirstName LastName (ID: ID)
+                        selectElement.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error("Error populating soldiers for update dropdown:", err);
+            }
+        }
+
+        function populateEquipmentForUpdateDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">-- Select Equipment --</option>';
+            try {
+                const equipment = db.exec("SELECT EquipmentID, EquipmentName, SerialNumber FROM Equipment ORDER BY EquipmentName;");
+                if (equipment.length > 0) {
+                    equipment[0].values.forEach(row => {
+                        const option = document.createElement('option');
+                        option.value = row[0]; // EquipmentID
+                        option.textContent = `${row[1]} (SN: ${row[2]})`; // EquipmentName (SN: SerialNumber)
+                        selectElement.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error("Error populating equipment for update dropdown:", err);
+            }
+        }
+
+        function populateMissionsForUpdateDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">-- Select Mission --</option>';
+            try {
+                const missions = db.exec("SELECT MissionID, MissionName FROM Missions ORDER BY MissionName;");
+                if (missions.length > 0) {
+                    missions[0].values.forEach(row => {
+                        const option = document.createElement('option');
+                        option.value = row[0]; // MissionID
+                        option.textContent = `${row[1]} (ID: ${row[0]})`; // MissionName (ID: ID)
+                        selectElement.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error("Error populating missions for update dropdown:", err);
+            }
+        }
+
+        // --- Load Details Functions ---
+
+        function loadSoldierDetails() {
+            const soldierId = document.getElementById('selectSoldierToUpdate').value;
+            const updateFirstName = document.getElementById('updateFirstName');
+            const updateLastName = document.getElementById('updateLastName');
+            const updateRank = document.getElementById('updateRank');
+            const updateUnit = document.getElementById('updateUnit');
+            const updateStatus = document.getElementById('updateStatus');
+
+            clearFormFields('updateSoldierForm'); // Clear fields before loading
+
+            if (!soldierId) return;
+
+            try {
+                const soldierDetails = db.exec(`SELECT
+                    FirstName,
+                    LastName,
+                    RankID,
+                    UnitID,
+                    Status
+                FROM Soldiers
+                WHERE SoldierID = ${soldierId};`);
+
+                if (soldierDetails.length > 0 && soldierDetails[0].values.length > 0) {
+                    const details = soldierDetails[0].values[0];
+                    updateFirstName.value = details[0];
+                    updateLastName.value = details[1];
+                    updateRank.value = details[2];
+                    updateUnit.value = details[3] !== null ? details[3] : '';
+                    updateStatus.value = details[4];
+                } else {
+                    showMessage('Soldier not found.', 'error');
+                }
+            } catch (err) {
+                console.error("Error loading soldier details:", err);
+                showMessage(`Error loading soldier details: ${err.message}`, 'error');
+            }
+        }
+
+        function loadUnitDetails() {
+            const unitId = document.getElementById('selectUnitToUpdate').value;
+            const updateUnitName = document.getElementById('updateUnitName');
+            const updateUnitLocation = document.getElementById('updateUnitLocation');
+            const updateUnitType = document.getElementById('updateUnitType');
+            const updateUnitCommander = document.getElementById('updateUnitCommander');
+
+            clearFormFields('updateUnitForm');
+
+            if (!unitId) return;
+
+            try {
+                const unitDetails = db.exec(`SELECT
+                    UnitName,
+                    Location,
+                    UnitType,
+                    CommanderID
+                FROM Units
+                WHERE UnitID = ${unitId};`);
+
+                if (unitDetails.length > 0 && unitDetails[0].values.length > 0) {
+                    const details = unitDetails[0].values[0];
+                    updateUnitName.value = details[0];
+                    updateUnitLocation.value = details[1];
+                    updateUnitType.value = details[2];
+                    updateUnitCommander.value = details[3] !== null ? details[3] : '';
+                } else {
+                    showMessage('Unit not found.', 'error');
+                }
+            } catch (err) {
+                console.error("Error loading unit details:", err);
+                showMessage(`Error loading unit details: ${err.message}`, 'error');
+            }
+        }
+
+        function loadEquipmentDetails() {
+            const equipmentId = document.getElementById('selectEquipmentToUpdate').value;
+            const updateEquipmentName = document.getElementById('updateEquipmentName');
+            const updateEquipmentType = document.getElementById('updateEquipmentType');
+            const updateSerialNumber = document.getElementById('updateSerialNumber');
+            const updateEquipmentUnit = document.getElementById('updateEquipmentUnit');
+            const updateEquipmentStatus = document.getElementById('updateEquipmentStatus');
+
+            clearFormFields('updateEquipmentForm');
+
+            if (!equipmentId) return;
+
+            try {
+                const equipmentDetails = db.exec(`SELECT
+                    EquipmentName,
+                    EquipmentType,
+                    SerialNumber,
+                    CurrentUnitID,
+                    Status
+                FROM Equipment
+                WHERE EquipmentID = ${equipmentId};`);
+
+                if (equipmentDetails.length > 0 && equipmentDetails[0].values.length > 0) {
+                    const details = equipmentDetails[0].values[0];
+                    updateEquipmentName.value = details[0];
+                    updateEquipmentType.value = details[1];
+                    updateSerialNumber.value = details[2];
+                    updateEquipmentUnit.value = details[3] !== null ? details[3] : '';
+                    updateEquipmentStatus.value = details[4];
+                } else {
+                    showMessage('Equipment not found.', 'error');
+                }
+            } catch (err) {
+                console.error("Error loading equipment details:", err);
+                showMessage(`Error loading equipment details: ${err.message}`, 'error');
+            }
+        }
+
+        function loadMissionDetails() {
+            const missionId = document.getElementById('selectMissionToUpdate').value;
+            const updateMissionName = document.getElementById('updateMissionName');
+            const updateMissionStartDate = document.getElementById('updateMissionStartDate');
+            const updateMissionEndDate = document.getElementById('updateMissionEndDate');
+            const updateMissionObjective = document.getElementById('updateMissionObjective');
+            const updateMissionStatus = document.getElementById('updateMissionStatus');
+
+            clearFormFields('updateMissionForm');
+
+            if (!missionId) return;
+
+            try {
+                const missionDetails = db.exec(`SELECT
+                    MissionName,
+                    StartDate,
+                    EndDate,
+                    Objective,
+                    Status
+                FROM Missions
+                WHERE MissionID = ${missionId};`);
+
+                if (missionDetails.length > 0 && missionDetails[0].values.length > 0) {
+                    const details = missionDetails[0].values[0];
+                    updateMissionName.value = details[0];
+                    updateMissionStartDate.value = details[1];
+                    updateMissionEndDate.value = details[2] !== null ? details[2] : '';
+                    updateMissionObjective.value = details[3];
+                    updateMissionStatus.value = details[4];
+                } else {
+                    showMessage('Mission not found.', 'error');
+                }
+            } catch (err) {
+                console.error("Error loading mission details:", err);
+                showMessage(`Error loading mission details: ${err.message}`, 'error');
+            }
+        }
+
+        // --- Database Initialization ---
+
+        async function initDb() {
+            try {
+                // Initialize SQL.js
+                const SQL = await initSqlJs({
+                    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                });
+                db = new SQL.Database(); // Create a new database
+
+                // SQL statements to create tables
+                const createTablesSql = `
+                    PRAGMA foreign_keys = ON; -- Enable foreign key support in SQLite
+
+                    CREATE TABLE Ranks (
+                        RankID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        RankName TEXT NOT NULL UNIQUE,
+                        PayGrade TEXT
+                    );
+
+                    CREATE TABLE Units (
+                        UnitID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        UnitName TEXT NOT NULL UNIQUE,
+                        CommanderID INTEGER,
+                        Location TEXT,
+                        UnitType TEXT,
+                        FOREIGN KEY (CommanderID) REFERENCES Soldiers(SoldierID) ON DELETE SET NULL
+                    );
+
+                    CREATE TABLE Soldiers (
+                        SoldierID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        FirstName TEXT NOT NULL,
+                        LastName TEXT NOT NULL,
+                        DateOfBirth TEXT,
+                        Gender TEXT,
+                        RankID INTEGER NOT NULL,
+                        UnitID INTEGER,
+                        DateOfEnlistment TEXT NOT NULL,
+                        Status TEXT DEFAULT 'Active',
+                        FOREIGN KEY (RankID) REFERENCES Ranks(RankID) ON DELETE RESTRICT,
+                        FOREIGN KEY (UnitID) REFERENCES Units(UnitID) ON DELETE SET NULL
+                    );
+
+                    CREATE TABLE Equipment (
+                        EquipmentID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        EquipmentName TEXT NOT NULL,
+                        EquipmentType TEXT,
+                        SerialNumber TEXT UNIQUE,
+                        CurrentUnitID INTEGER,
+                        Status TEXT DEFAULT 'Operational',
+                        FOREIGN KEY (CurrentUnitID) REFERENCES Units(UnitID) ON DELETE SET NULL
+                    );
+
+                    CREATE TABLE Missions (
+                        MissionID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        MissionName TEXT NOT NULL,
+                        StartDate TEXT NOT NULL,
+                        EndDate TEXT,
+                        Objective TEXT,
+                        Status TEXT DEFAULT 'Planned'
+                    );
+
+                    CREATE TABLE MissionAssignments (
+                        MissionAssignmentID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        MissionID INTEGER NOT NULL,
+                        SoldierID INTEGER,
+                        UnitID INTEGER,
+                        AssignmentRole TEXT,
+                        StartDate TEXT,
+                        EndDate TEXT,
+                        FOREIGN KEY (MissionID) REFERENCES Missions(MissionID) ON DELETE CASCADE,
+                        FOREIGN KEY (SoldierID) REFERENCES Soldiers(SoldierID) ON DELETE CASCADE,
+                        FOREIGN KEY (UnitID) REFERENCES Units(UnitID) ON DELETE CASCADE,
+                        CHECK (SoldierID IS NOT NULL OR UnitID IS NOT NULL)
+                    );
+                `;
+                db.run(createTablesSql); // Execute table creation
+
+                // SQL statements to insert initial data
+                const insertDataSql = `
+                    INSERT INTO Ranks (RankName, PayGrade) VALUES ('Private', 'E-1');
+                    INSERT INTO Ranks (RankName, PayGrade) VALUES ('Corporal', 'E-4');
+                    INSERT INTO Ranks (RankName, PayGrade) VALUES ('Sergeant', 'E-5');
+                    INSERT INTO Ranks (RankName, PayGrade) VALUES ('Lieutenant', 'O-1');
+                    INSERT INTO Ranks (RankName, PayGrade) VALUES ('Captain', 'O-3');
+                    INSERT INTO Ranks (RankName, PayGrade) VALUES ('Major', 'O-4');
+                    INSERT INTO Ranks (RankName, PayGrade) VALUES ('Colonel', 'O-6');
+
+                    INSERT INTO Units (UnitName, Location, UnitType) VALUES ('Alpha Company', 'Fort Bragg', 'Infantry');
+                    INSERT INTO Units (UnitName, Location, UnitType) VALUES ('Bravo Squadron', 'Ramstein AB', 'Air Force');
+                    INSERT INTO Units (UnitName, Location, UnitType) VALUES ('Charlie Platoon', 'Camp Lejeune', 'Marine Corps');
+
+                    INSERT INTO Soldiers (FirstName, LastName, DateOfBirth, Gender, RankID, UnitID, DateOfEnlistment)
+                    VALUES ('John', 'Doe', '1995-03-15', 'M', (SELECT RankID FROM Ranks WHERE RankName = 'Sergeant'), (SELECT UnitID FROM Units WHERE UnitName = 'Alpha Company'), '2015-06-01');
+
+                    INSERT INTO Soldiers (FirstName, LastName, DateOfBirth, Gender, RankID, UnitID, DateOfEnlistment)
+                    VALUES ('Jane', 'Smith', '1998-11-22', 'F', (SELECT RankID FROM Ranks WHERE RankName = 'Captain'), (SELECT UnitID FROM Units WHERE UnitName = 'Bravo Squadron'), '2018-01-10');
+
+                    INSERT INTO Soldiers (FirstName, LastName, DateOfBirth, Gender, RankID, UnitID, DateOfEnlistment)
+                    VALUES ('Peter', 'Jones', '1992-07-04', 'M', (SELECT RankID FROM Ranks WHERE RankName = 'Lieutenant'), (SELECT UnitID FROM Units WHERE UnitName = 'Alpha Company'), '2014-09-20');
+
+                    UPDATE Units
+                    SET CommanderID = (SELECT SoldierID FROM Soldiers WHERE FirstName = 'Jane' AND LastName = 'Smith')
+                    WHERE UnitName = 'Bravo Squadron';
+
+                    INSERT INTO Equipment (EquipmentName, EquipmentType, SerialNumber, CurrentUnitID)
+                    VALUES ('M4 Carbine', 'Rifle', 'SN001ABC', (SELECT UnitID FROM Units WHERE UnitName = 'Alpha Company'));
+
+                    INSERT INTO Equipment (EquipmentName, EquipmentType, SerialNumber, CurrentUnitID)
+                    VALUES ('F-16 Fighting Falcon', 'Fighter Jet', 'SN002DEF', (SELECT UnitID FROM Units WHERE UnitName = 'Bravo Squadron'));
+
+                    INSERT INTO Missions (MissionName, StartDate, Objective)
+                    VALUES ('Operation Desert Shield', '2025-07-01', 'Secure vital oil fields.');
+
+                    INSERT INTO Missions (MissionName, StartDate, EndDate, Objective, Status)
+                    VALUES ('Exercise Ironclad', '2025-05-10', '2025-05-20', 'Train joint forces.', 'Completed');
+
+                    INSERT INTO MissionAssignments (MissionID, SoldierID, AssignmentRole, StartDate)
+                    VALUES ((SELECT MissionID FROM Missions WHERE MissionName = 'Operation Desert Shield'), (SELECT SoldierID FROM Soldiers WHERE FirstName = 'John' AND LastName = 'Doe'), 'Team Leader', '2025-07-01');
+
+                    INSERT INTO MissionAssignments (MissionID, UnitID, AssignmentRole, StartDate)
+                    VALUES ((SELECT MissionID FROM Missions WHERE MissionName = 'Operation Desert Shield'), (SELECT UnitID FROM Units WHERE UnitName = 'Alpha Company'), 'Main Force', '2025-07-01');
+                `;
+                db.run(insertDataSql); // Execute data insertion
+                showMessage('Database initialized and populated!', 'info');
+                // Populate all dropdowns after initial data is inserted
+                populateRanksDropdown(document.getElementById('addSoldierRank')); // For Add Soldier
+                populateUnitsDropdown(document.getElementById('addSoldierUnit')); // For Add Soldier
+                populateRanksDropdown(document.getElementById('updateRank'));
+                populateUnitsDropdown(document.getElementById('updateUnit'));
+                populateSoldiersForUpdateDropdown(document.getElementById('selectSoldierToUpdate'));
+                populateUnitsDropdown(document.getElementById('selectUnitToUpdate'));
+                populateSoldiersForCommanderDropdown(document.getElementById('addUnitCommander')); // For Add Unit
+                populateSoldiersForCommanderDropdown(document.getElementById('updateUnitCommander'));
+                populateEquipmentForUpdateDropdown(document.getElementById('selectEquipmentToUpdate'));
+                populateUnitsDropdown(document.getElementById('addEquipmentUnit')); // For Add Equipment
+                populateUnitsDropdown(document.getElementById('updateEquipmentUnit'));
+                populateMissionsForUpdateDropdown(document.getElementById('selectMissionToUpdate'));
+
+            } catch (err) {
+                console.error("Database initialization error:", err);
+                showMessage(`Database initialization failed: ${err.message}`, 'error');
+            }
+        }
+
+        // Function to execute a SQL query and display results
+        function executeQuery(query) {
+            const resultsOutput = document.getElementById('resultsOutput');
+            resultsOutput.innerHTML = ''; // Clear previous results
+
+            if (!query.trim()) {
+                showMessage('No query provided.', 'info');
+                return;
+            }
+
+            try {
+                const res = db.exec(query); // Execute the SQL query
+
+                if (res.length === 0) {
+                    // No results (e.g., for INSERT, UPDATE, DELETE)
+                    resultsOutput.innerHTML = `<p class="text-green-600">Query executed successfully. No data returned.</p>`;
+                    showMessage('Query executed successfully.', 'success');
+                } else {
+                    // Display results in a table
+                    const table = document.createElement('table');
+                    table.classList.add('min-w-full', 'divide-y', 'divide-gray-200', 'rounded-lg', 'overflow-hidden');
+
+                    // Create table header
+                    const thead = document.createElement('thead');
+                    const headerRow = document.createElement('tr');
+                    res[0].columns.forEach(col => {
+                        const th = document.createElement('th');
+                        th.textContent = col;
+                        th.classList.add('px-6', 'py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider');
+                        headerRow.appendChild(th);
+                    });
+                    thead.appendChild(headerRow);
+                    table.appendChild(thead);
+
+                    // Create table body
+                    const tbody = document.createElement('tbody');
+                    tbody.classList.add('bg-white', 'divide-y', 'divide-gray-200');
+                    res[0].values.forEach(row => {
+                        const tr = document.createElement('tr');
+                        row.forEach(cell => {
+                            const td = document.createElement('td');
+                            td.textContent = cell !== null ? cell : 'NULL'; // Handle null values
+                            td.classList.add('px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'text-gray-900');
+                            tr.appendChild(td);
+                        });
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+                    resultsOutput.appendChild(table);
+                    showMessage('Query executed and results displayed.', 'success');
+                }
+            } catch (err) {
+                console.error("SQL error:", err);
+                resultsOutput.innerHTML = `<p class="text-red-600">Error: ${err.message}</p>`;
+                showMessage(`Error executing query: ${err.message}`, 'error');
+            }
+        }
+
+        // --- Handle Add Form Submissions ---
+
+        function handleAddSoldier(event) {
+            event.preventDefault();
+
+            const firstName = document.getElementById('addSoldierFirstName').value.trim();
+            const lastName = document.getElementById('addSoldierLastName').value.trim();
+            const dateOfBirth = document.getElementById('addSoldierDateOfBirth').value;
+            const gender = document.getElementById('addSoldierGender').value;
+            const rankId = document.getElementById('addSoldierRank').value;
+            const unitId = document.getElementById('addSoldierUnit').value;
+            const dateOfEnlistment = document.getElementById('addSoldierDateOfEnlistment').value;
+            const status = document.getElementById('addSoldierStatus').value;
+
+            if (!firstName || !lastName || !rankId || !dateOfEnlistment) {
+                showMessage('First Name, Last Name, Rank, and Date of Enlistment are required.', 'error');
+                return;
+            }
+
+            let columns = ['FirstName', 'LastName', 'RankID', 'DateOfEnlistment', 'Status'];
+            let values = ['?', '?', '?', '?', '?'];
+            let params = [firstName, lastName, parseInt(rankId), dateOfEnlistment, status];
+
+            if (dateOfBirth) { columns.push('DateOfBirth'); values.push('?'); params.push(dateOfBirth); }
+            if (gender) { columns.push('Gender'); values.push('?'); params.push(gender); }
+            if (unitId) { columns.push('UnitID'); values.push('?'); params.push(parseInt(unitId)); }
+
+            const insertSql = `INSERT INTO Soldiers (${columns.join(', ')}) VALUES (${values.join(', ')});`;
+
+            try {
+                db.run(insertSql, params);
+                showMessage(`New Soldier '${firstName} ${lastName}' added successfully!`, 'success');
+                clearFormFields('addSoldierForm');
+                populateSoldiersForUpdateDropdown(document.getElementById('selectSoldierToUpdate')); // Refresh update dropdown
+                populateSoldiersForCommanderDropdown(document.getElementById('addUnitCommander')); // Refresh commander dropdown
+                populateSoldiersForCommanderDropdown(document.getElementById('updateUnitCommander')); // Refresh commander dropdown
+                executeQuery(`SELECT S.SoldierID, S.FirstName, S.LastName, R.RankName, U.UnitName, S.DateOfEnlistment, S.Status FROM Soldiers AS S JOIN Ranks AS R ON S.RankID = R.RankID LEFT JOIN Units AS U ON S.UnitID = U.UnitID ORDER BY S.SoldierID DESC LIMIT 1;`);
+                hideAllForms();
+            } catch (err) {
+                console.error("Add Soldier error:", err);
+                showMessage(`Error adding soldier: ${err.message}`, 'error');
+            }
+        }
+
+        function handleAddUnit(event) {
+            event.preventDefault();
+
+            const unitName = document.getElementById('addUnitName').value.trim();
+            const location = document.getElementById('addUnitLocation').value.trim();
+            const unitType = document.getElementById('addUnitType').value.trim();
+            const commanderId = document.getElementById('addUnitCommander').value;
+
+            if (!unitName) {
+                showMessage('Unit Name is required.', 'error');
+                return;
+            }
+
+            let columns = ['UnitName'];
+            let values = ['?'];
+            let params = [unitName];
+
+            if (location) { columns.push('Location'); values.push('?'); params.push(location); }
+            if (unitType) { columns.push('UnitType'); values.push('?'); params.push(unitType); }
+            if (commanderId) { columns.push('CommanderID'); values.push('?'); params.push(parseInt(commanderId)); }
+
+            const insertSql = `INSERT INTO Units (${columns.join(', ')}) VALUES (${values.join(', ')});`;
+
+            try {
+                db.run(insertSql, params);
+                showMessage(`New Unit '${unitName}' added successfully!`, 'success');
+                clearFormFields('addUnitForm');
+                populateUnitsDropdown(document.getElementById('addSoldierUnit')); // Refresh soldier unit dropdown
+                populateUnitsDropdown(document.getElementById('updateUnit')); // Refresh update unit dropdown
+                populateUnitsDropdown(document.getElementById('selectUnitToUpdate')); // Refresh update unit dropdown
+                populateUnitsDropdown(document.getElementById('addEquipmentUnit')); // Refresh add equipment unit dropdown
+                populateUnitsDropdown(document.getElementById('updateEquipmentUnit')); // Refresh update equipment unit dropdown
+                executeQuery(`SELECT UnitID, UnitName, Location, UnitType FROM Units ORDER BY UnitID DESC LIMIT 1;`);
+                hideAllForms();
+            } catch (err) {
+                console.error("Add Unit error:", err);
+                showMessage(`Error adding unit: ${err.message}`, 'error');
+            }
+        }
+
+        function handleAddEquipment(event) {
+            event.preventDefault();
+
+            const equipmentName = document.getElementById('addEquipmentName').value.trim();
+            const equipmentType = document.getElementById('addEquipmentType').value.trim();
+            const serialNumber = document.getElementById('addSerialNumber').value.trim();
+            const currentUnitId = document.getElementById('addEquipmentUnit').value;
+            const status = document.getElementById('addEquipmentStatus').value;
+
+            if (!equipmentName || !serialNumber) {
+                showMessage('Equipment Name and Serial Number are required.', 'error');
+                return;
+            }
+
+            let columns = ['EquipmentName', 'SerialNumber', 'Status'];
+            let values = ['?', '?', '?'];
+            let params = [equipmentName, serialNumber, status];
+
+            if (equipmentType) { columns.push('EquipmentType'); values.push('?'); params.push(equipmentType); }
+            if (currentUnitId) { columns.push('CurrentUnitID'); values.push('?'); params.push(parseInt(currentUnitId)); }
+
+            const insertSql = `INSERT INTO Equipment (${columns.join(', ')}) VALUES (${values.join(', ')});`;
+
+            try {
+                db.run(insertSql, params);
+                showMessage(`New Equipment '${equipmentName}' added successfully!`, 'success');
+                clearFormFields('addEquipmentForm');
+                populateEquipmentForUpdateDropdown(document.getElementById('selectEquipmentToUpdate')); // Refresh update dropdown
+                executeQuery(`SELECT EquipmentID, EquipmentName, EquipmentType, SerialNumber, Status FROM Equipment ORDER BY EquipmentID DESC LIMIT 1;`);
+                hideAllForms();
+            } catch (err) {
+                console.error("Add Equipment error:", err);
+                showMessage(`Error adding equipment: ${err.message}`, 'error');
+            }
+        }
+
+        function handleAddMission(event) {
+            event.preventDefault();
+
+            const missionName = document.getElementById('addMissionName').value.trim();
+            const startDate = document.getElementById('addMissionStartDate').value;
+            const endDate = document.getElementById('addMissionEndDate').value;
+            const objective = document.getElementById('addMissionObjective').value.trim();
+            const status = document.getElementById('addMissionStatus').value;
+
+            if (!missionName || !startDate) {
+                showMessage('Mission Name and Start Date are required.', 'error');
+                return;
+            }
+
+            let columns = ['MissionName', 'StartDate', 'Status'];
+            let values = ['?', '?', '?'];
+            let params = [missionName, startDate, status];
+
+            if (endDate) { columns.push('EndDate'); values.push('?'); params.push(endDate); }
+            if (objective) { columns.push('Objective'); values.push('?'); params.push(objective); }
+
+            const insertSql = `INSERT INTO Missions (${columns.join(', ')}) VALUES (${values.join(', ')});`;
+
+            try {
+                db.run(insertSql, params);
+                showMessage(`New Mission '${missionName}' added successfully!`, 'success');
+                clearFormFields('addMissionForm');
+                populateMissionsForUpdateDropdown(document.getElementById('selectMissionToUpdate')); // Refresh update dropdown
+                executeQuery(`SELECT MissionID, MissionName, StartDate, EndDate, Objective, Status FROM Missions ORDER BY MissionID DESC LIMIT 1;`);
+                hideAllForms();
+            } catch (err) {
+                console.error("Add Mission error:", err);
+                showMessage(`Error adding mission: ${err.message}`, 'error');
+            }
+        }
+
+
+        // --- Handle Update Form Submissions ---
+
+        function handleUpdateSoldier(event) {
+            event.preventDefault();
+
+            const soldierId = document.getElementById('selectSoldierToUpdate').value;
+            const firstName = document.getElementById('updateFirstName').value.trim();
+            const lastName = document.getElementById('updateLastName').value.trim();
+            const rankId = document.getElementById('updateRank').value;
+            const unitId = document.getElementById('updateUnit').value;
+            const status = document.getElementById('updateStatus').value;
+
+            if (!soldierId) { showMessage('Please select a Soldier to update.', 'error'); return; }
+
+            let updateClauses = [];
+            let params = [];
+
+            if (firstName) { updateClauses.push('FirstName = ?'); params.push(firstName); }
+            if (lastName) { updateClauses.push('LastName = ?'); params.push(lastName); }
+            if (rankId) { updateClauses.push('RankID = ?'); params.push(parseInt(rankId)); }
+            if (unitId !== '') { updateClauses.push('UnitID = ?'); params.push(parseInt(unitId)); } else { updateClauses.push('UnitID = NULL'); }
+            if (status) { updateClauses.push('Status = ?'); params.push(status); }
+
+            if (updateClauses.length === 0) { showMessage('No fields provided for update. Please fill at least one field.', 'info'); return; }
+
+            const updateSql = `UPDATE Soldiers SET ${updateClauses.join(', ')} WHERE SoldierID = ?;`;
+            params.push(parseInt(soldierId));
+
+            try {
+                db.run(updateSql, params);
+                showMessage(`Soldier with ID ${soldierId} updated successfully!`, 'success');
+                populateSoldiersForUpdateDropdown(document.getElementById('selectSoldierToUpdate')); // Refresh soldier list
+                loadSoldierDetails(); // Reload details for current selection
+                executeQuery(`SELECT S.SoldierID, S.FirstName, S.LastName, R.RankName, U.UnitName, S.DateOfEnlistment, S.Status FROM Soldiers AS S JOIN Ranks AS R ON S.RankID = R.RankID LEFT JOIN Units AS U ON S.UnitID = U.UnitID WHERE S.SoldierID = ${soldierId};`);
+                hideAllForms(); // Hide form after successful update
+            } catch (err) {
+                console.error("Update Soldier error:", err);
+                showMessage(`Error updating soldier: ${err.message}`, 'error');
+            }
+        }
+
+        function handleUpdateUnit(event) {
+            event.preventDefault();
+
+            const unitId = document.getElementById('selectUnitToUpdate').value;
+            const unitName = document.getElementById('updateUnitName').value.trim();
+            const location = document.getElementById('updateUnitLocation').value.trim();
+            const unitType = document.getElementById('updateUnitType').value.trim();
+            const commanderId = document.getElementById('updateUnitCommander').value;
+
+            if (!unitId) { showMessage('Please select a Unit to update.', 'error'); return; }
+
+            let updateClauses = [];
+            let params = [];
+
+            if (unitName) { updateClauses.push('UnitName = ?'); params.push(unitName); }
+            if (location) { updateClauses.push('Location = ?'); params.push(location); }
+            if (unitType) { updateClauses.push('UnitType = ?'); params.push(unitType); }
+            if (commanderId !== '') { updateClauses.push('CommanderID = ?'); params.push(parseInt(commanderId)); } else { updateClauses.push('CommanderID = NULL'); }
+
+            if (updateClauses.length === 0) { showMessage('No fields provided for update. Please fill at least one field.', 'info'); return; }
+
+            const updateSql = `UPDATE Units SET ${updateClauses.join(', ')} WHERE UnitID = ?;`;
+            params.push(parseInt(unitId));
+
+            try {
+                db.run(updateSql, params);
+                showMessage(`Unit with ID ${unitId} updated successfully!`, 'success');
+                populateUnitsDropdown(document.getElementById('selectUnitToUpdate')); // Refresh unit list
+                loadUnitDetails(); // Reload details for current selection
+                executeQuery(`SELECT U.UnitID, U.UnitName, U.Location, U.UnitType, S.FirstName || ' ' || S.LastName AS CommanderName FROM Units AS U LEFT JOIN Soldiers AS S ON U.CommanderID = S.SoldierID WHERE U.UnitID = ${unitId};`);
+                hideAllForms();
+            } catch (err) {
+                console.error("Update Unit error:", err);
+                showMessage(`Error updating unit: ${err.message}`, 'error');
+            }
+        }
+
+        function handleUpdateEquipment(event) {
+            event.preventDefault();
+
+            const equipmentId = document.getElementById('selectEquipmentToUpdate').value;
+            const equipmentName = document.getElementById('updateEquipmentName').value.trim();
+            const equipmentType = document.getElementById('updateEquipmentType').value.trim();
+            const serialNumber = document.getElementById('updateSerialNumber').value.trim();
+            const currentUnitId = document.getElementById('updateEquipmentUnit').value;
+            const status = document.getElementById('updateEquipmentStatus').value;
+
+            if (!equipmentId) { showMessage('Please select Equipment to update.', 'error'); return; }
+
+            let updateClauses = [];
+            let params = [];
+
+            if (equipmentName) { updateClauses.push('EquipmentName = ?'); params.push(equipmentName); }
+            if (equipmentType) { updateClauses.push('EquipmentType = ?'); params.push(equipmentType); }
+            if (serialNumber) { updateClauses.push('SerialNumber = ?'); params.push(serialNumber); }
+            if (currentUnitId !== '') { updateClauses.push('CurrentUnitID = ?'); params.push(parseInt(currentUnitId)); } else { updateClauses.push('CurrentUnitID = NULL'); }
+            if (status) { updateClauses.push('Status = ?'); params.push(status); }
+
+            if (updateClauses.length === 0) { showMessage('No fields provided for update. Please fill at least one field.', 'info'); return; }
+
+            const updateSql = `UPDATE Equipment SET ${updateClauses.join(', ')} WHERE EquipmentID = ?;`;
+            params.push(parseInt(equipmentId));
+
+            try {
+                db.run(updateSql, params);
+                showMessage(`Equipment with ID ${equipmentId} updated successfully!`, 'success');
+                populateEquipmentForUpdateDropdown(document.getElementById('selectEquipmentToUpdate')); // Refresh equipment list
+                loadEquipmentDetails(); // Reload details for current selection
+                executeQuery(`SELECT E.EquipmentName, E.EquipmentType, E.SerialNumber, U.UnitName AS CurrentUnit, E.Status FROM Equipment AS E LEFT JOIN Units AS U ON E.CurrentUnitID = U.UnitID WHERE E.EquipmentID = ${equipmentId};`);
+                hideAllForms();
+            } catch (err) {
+                console.error("Update Equipment error:", err);
+                showMessage(`Error updating equipment: ${err.message}`, 'error');
+            }
+        }
+
+        function handleUpdateMission(event) {
+            event.preventDefault();
+
+            const missionId = document.getElementById('selectMissionToUpdate').value;
+            const missionName = document.getElementById('updateMissionName').value.trim();
+            const startDate = document.getElementById('updateMissionStartDate').value;
+            const endDate = document.getElementById('updateMissionEndDate').value;
+            const objective = document.getElementById('updateMissionObjective').value.trim();
+            const status = document.getElementById('updateMissionStatus').value;
+
+            if (!missionId) { showMessage('Please select a Mission to update.', 'error'); return; }
+
+            let updateClauses = [];
+            let params = [];
+
+            if (missionName) { updateClauses.push('MissionName = ?'); params.push(missionName); }
+            if (startDate) { updateClauses.push('StartDate = ?'); params.push(startDate); }
+            if (endDate !== '') { updateClauses.push('EndDate = ?'); params.push(endDate); } else { updateClauses.push('EndDate = NULL'); }
+            if (objective) { updateClauses.push('Objective = ?'); params.push(objective); }
+            if (status) { updateClauses.push('Status = ?'); params.push(status); }
+
+            if (updateClauses.length === 0) { showMessage('No fields provided for update. Please fill at least one field.', 'info'); return; }
+
+            const updateSql = `UPDATE Missions SET ${updateClauses.join(', ')} WHERE MissionID = ?;`;
+            params.push(parseInt(missionId));
+
+            try {
+                db.run(updateSql, params);
+                showMessage(`Mission with ID ${missionId} updated successfully!`, 'success');
+                populateMissionsForUpdateDropdown(document.getElementById('selectMissionToUpdate')); // Refresh mission list
+                loadMissionDetails(); // Reload details for current selection
+                executeQuery(`SELECT MissionID, MissionName, StartDate, EndDate, Objective, Status FROM Missions WHERE MissionID = ${missionId};`);
+                hideAllForms();
+            } catch (err) {
+                console.error("Update Mission error:", err);
+                showMessage(`Error updating mission: ${err.message}`, 'error');
+            }
+        }
+
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initDb();
+
+            document.getElementById('resetDbBtn').addEventListener('click', async () => {
+                db.close();
+                await initDb();
+                document.getElementById('resultsOutput').innerHTML = '<p class="text-gray-500">Results will appear here...</p>';
+                showMessage('Database has been reset!', 'info');
+                hideAllForms();
+                document.getElementById('actionDropdown').value = ''; // Reset dropdown
+            });
+
+            // Main Action Dropdown Listener
+            document.getElementById('actionDropdown').addEventListener('change', (event) => {
+                hideAllForms(); // Hide all forms first
+                const selectedAction = event.target.value;
+                const formsContainer = document.getElementById('formsContainer');
+
+                if (selectedAction) {
+                    formsContainer.classList.remove('hidden'); // Show the main forms container
+                    switch (selectedAction) {
+                        case 'addSoldier':
+                            document.getElementById('addSoldierFormContainer').classList.remove('hidden');
+                            populateRanksDropdown(document.getElementById('addSoldierRank'));
+                            populateUnitsDropdown(document.getElementById('addSoldierUnit'));
+                            clearFormFields('addSoldierForm');
+                            document.getElementById('addSoldierStatus').value = 'Active'; // Default status
+                            document.getElementById('addSoldierDateOfEnlistment').valueAsDate = new Date(); // Default to today
+                            break;
+                        case 'addUnit':
+                            document.getElementById('addUnitFormContainer').classList.remove('hidden');
+                            populateSoldiersForCommanderDropdown(document.getElementById('addUnitCommander'));
+                            clearFormFields('addUnitForm');
+                            break;
+                        case 'addEquipment':
+                            document.getElementById('addEquipmentFormContainer').classList.remove('hidden');
+                            populateUnitsDropdown(document.getElementById('addEquipmentUnit'));
+                            clearFormFields('addEquipmentForm');
+                            document.getElementById('addEquipmentStatus').value = 'Operational'; // Default status
+                            break;
+                        case 'addMission':
+                            document.getElementById('addMissionFormContainer').classList.remove('hidden');
+                            clearFormFields('addMissionForm');
+                            document.getElementById('addMissionStatus').value = 'Planned'; // Default status
+                            document.getElementById('addMissionStartDate').valueAsDate = new Date(); // Default to today
+                            break;
+                        case 'updateSoldier':
+                            document.getElementById('updateSoldierFormContainer').classList.remove('hidden');
+                            populateSoldiersForUpdateDropdown(document.getElementById('selectSoldierToUpdate'));
+                            populateRanksDropdown(document.getElementById('updateRank'));
+                            populateUnitsDropdown(document.getElementById('updateUnit'));
+                            document.getElementById('selectSoldierToUpdate').value = ''; // Reset selection
+                            clearFormFields('updateSoldierForm');
+                            break;
+                        case 'updateUnit':
+                            document.getElementById('updateUnitFormContainer').classList.remove('hidden');
+                            populateUnitsDropdown(document.getElementById('selectUnitToUpdate'));
+                            populateSoldiersForCommanderDropdown(document.getElementById('updateUnitCommander'));
+                            document.getElementById('selectUnitToUpdate').value = ''; // Reset selection
+                            clearFormFields('updateUnitForm');
+                            break;
+                        case 'updateEquipment':
+                            document.getElementById('updateEquipmentFormContainer').classList.remove('hidden');
+                            populateEquipmentForUpdateDropdown(document.getElementById('selectEquipmentToUpdate'));
+                            populateUnitsDropdown(document.getElementById('updateEquipmentUnit'));
+                            document.getElementById('selectEquipmentToUpdate').value = ''; // Reset selection
+                            clearFormFields('updateEquipmentForm');
+                            break;
+                        case 'updateMission':
+                            document.getElementById('updateMissionFormContainer').classList.remove('hidden');
+                            populateMissionsForUpdateDropdown(document.getElementById('selectMissionToUpdate'));
+                            document.getElementById('selectMissionToUpdate').value = ''; // Reset selection
+                            clearFormFields('updateMissionForm');
+                            break;
+                    }
+                } else {
+                    formsContainer.classList.add('hidden'); // Hide if no action is selected
+                }
+            });
+
+            // Add Form Listeners
+            document.getElementById('addSoldierForm').addEventListener('submit', handleAddSoldier);
+            document.getElementById('closeAddSoldierFormBtn').addEventListener('click', () => { hideAllForms(); document.getElementById('actionDropdown').value = ''; });
+            document.getElementById('addSoldierFormContainer').addEventListener('dblclick', (event) => {
+                if (event.target.tagName !== 'SELECT' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON' && event.target.tagName !== 'TEXTAREA') {
+                    hideAllForms(); document.getElementById('actionDropdown').value = '';
+                }
+            });
+
+            document.getElementById('addUnitForm').addEventListener('submit', handleAddUnit);
+            document.getElementById('closeAddUnitFormBtn').addEventListener('click', () => { hideAllForms(); document.getElementById('actionDropdown').value = ''; });
+            document.getElementById('addUnitFormContainer').addEventListener('dblclick', (event) => {
+                if (event.target.tagName !== 'SELECT' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON' && event.target.tagName !== 'TEXTAREA') {
+                    hideAllForms(); document.getElementById('actionDropdown').value = '';
+                }
+            });
+
+            document.getElementById('addEquipmentForm').addEventListener('submit', handleAddEquipment);
+            document.getElementById('closeAddEquipmentFormBtn').addEventListener('click', () => { hideAllForms(); document.getElementById('actionDropdown').value = ''; });
+            document.getElementById('addEquipmentFormContainer').addEventListener('dblclick', (event) => {
+                if (event.target.tagName !== 'SELECT' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON' && event.target.tagName !== 'TEXTAREA') {
+                    hideAllForms(); document.getElementById('actionDropdown').value = '';
+                }
+            });
+
+            document.getElementById('addMissionForm').addEventListener('submit', handleAddMission);
+            document.getElementById('closeAddMissionFormBtn').addEventListener('click', () => { hideAllForms(); document.getElementById('actionDropdown').value = ''; });
+            document.getElementById('addMissionFormContainer').addEventListener('dblclick', (event) => {
+                if (event.target.tagName !== 'SELECT' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON' && event.target.tagName !== 'TEXTAREA') {
+                    hideAllForms(); document.getElementById('actionDropdown').value = '';
+                }
+            });
+
+
+            // Update Form Listeners (existing)
+            document.getElementById('updateSoldierForm').addEventListener('submit', handleUpdateSoldier);
+            document.getElementById('selectSoldierToUpdate').addEventListener('change', loadSoldierDetails);
+            document.getElementById('closeUpdateSoldierFormBtn').addEventListener('click', () => { hideAllForms(); document.getElementById('actionDropdown').value = ''; });
+            document.getElementById('updateSoldierFormContainer').addEventListener('dblclick', (event) => {
+                if (event.target.tagName !== 'SELECT' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON' && event.target.tagName !== 'TEXTAREA') {
+                    hideAllForms(); document.getElementById('actionDropdown').value = '';
+                }
+            });
+
+            document.getElementById('updateUnitForm').addEventListener('submit', handleUpdateUnit);
+            document.getElementById('selectUnitToUpdate').addEventListener('change', loadUnitDetails);
+            document.getElementById('closeUpdateUnitFormBtn').addEventListener('click', () => { hideAllForms(); document.getElementById('actionDropdown').value = ''; });
+            document.getElementById('updateUnitFormContainer').addEventListener('dblclick', (event) => {
+                if (event.target.tagName !== 'SELECT' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON' && event.target.tagName !== 'TEXTAREA') {
+                    hideAllForms(); document.getElementById('actionDropdown').value = '';
+                }
+            });
+
+            document.getElementById('updateEquipmentForm').addEventListener('submit', handleUpdateEquipment);
+            document.getElementById('selectEquipmentToUpdate').addEventListener('change', loadEquipmentDetails);
+            document.getElementById('closeUpdateEquipmentFormBtn').addEventListener('click', () => { hideAllForms(); document.getElementById('actionDropdown').value = ''; });
+            document.getElementById('updateEquipmentFormContainer').addEventListener('dblclick', (event) => {
+                if (event.target.tagName !== 'SELECT' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON' && event.target.tagName !== 'TEXTAREA') {
+                    hideAllForms(); document.getElementById('actionDropdown').value = '';
+                }
+            });
+
+            document.getElementById('updateMissionForm').addEventListener('submit', handleUpdateMission);
+            document.getElementById('selectMissionToUpdate').addEventListener('change', loadMissionDetails);
+            document.getElementById('closeUpdateMissionFormBtn').addEventListener('click', () => { hideAllForms(); document.getElementById('actionDropdown').value = ''; });
+            document.getElementById('updateMissionFormContainer').addEventListener('dblclick', (event) => {
+                if (event.target.tagName !== 'SELECT' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON' && event.target.tagName !== 'TEXTAREA') {
+                    hideAllForms(); document.getElementById('actionDropdown').value = '';
+                }
+            });
+
+
+            // Quick Action Select Buttons (existing)
+            document.getElementById('selectAllSoldiersBtn').addEventListener('click', () => {
+                hideAllForms();
+                document.getElementById('actionDropdown').value = '';
+                const query = `SELECT S.SoldierID, S.FirstName, S.LastName, R.RankName, U.UnitName, S.DateOfEnlistment, S.Status FROM Soldiers AS S JOIN Ranks AS R ON S.RankID = R.RankID LEFT JOIN Units AS U ON S.UnitID = U.UnitID;`;
+                executeQuery(query);
+            });
+
+            document.getElementById('selectAllUnitsBtn').addEventListener('click', () => {
+                hideAllForms();
+                document.getElementById('actionDropdown').value = '';
+                const query = `SELECT U.UnitID, U.UnitName, U.Location, U.UnitType, S.FirstName || ' ' || S.LastName AS CommanderName FROM Units AS U LEFT JOIN Soldiers AS S ON U.CommanderID = S.SoldierID;`;
+                executeQuery(query);
+            });
+
+            document.getElementById('selectAllEquipmentBtn').addEventListener('click', () => {
+                hideAllForms();
+                document.getElementById('actionDropdown').value = '';
+                const query = `SELECT E.EquipmentName, E.EquipmentType, E.SerialNumber, U.UnitName AS CurrentUnit, E.Status FROM Equipment AS E LEFT JOIN Units AS U ON E.CurrentUnitID = U.UnitID;`;
+                executeQuery(query);
+            });
+
+            document.getElementById('selectAllMissionsBtn').addEventListener('click', () => {
+                hideAllForms();
+                document.getElementById('actionDropdown').value = '';
+                const query = `SELECT M.MissionName, M.StartDate, M.EndDate, M.Objective, M.Status, GROUP_CONCAT(S.FirstName || ' ' || S.LastName, ', ') AS AssignedSoldiers, GROUP_CONCAT(U.UnitName, ', ') AS AssignedUnits FROM Missions AS M LEFT JOIN MissionAssignments AS MA ON M.MissionID = MA.MissionID LEFT JOIN Soldiers AS S ON MA.SoldierID = S.SoldierID LEFT JOIN Units AS U ON MA.UnitID = U.UnitID GROUP BY M.MissionID, M.MissionName, M.StartDate, M.EndDate, M.Objective, M.Status;`;
+                executeQuery(query);
+            });
+
+            // Double-click listener for the Query Results card
+            document.querySelector('.card:last-of-type').addEventListener('dblclick', () => {
+                document.getElementById('resultsOutput').innerHTML = '<p class="text-gray-500">Results will appear here...</p>';
+                showMessage('Query results cleared.', 'info');
+            });
+        });
+    </script>
+</body>
+</html>
